@@ -38,6 +38,7 @@ final class OpenAiModelTest extends TestCase
         self::assertTrue($result->transportSuccess);
         self::assertSame('openai', $result->model);
         self::assertSame('hello', $result->content);
+        self::assertIsArray($captured);
         self::assertSame('/v1/chat/completions', $captured['path']);
         self::assertSame('Bearer sk-test', $captured['auth']);
         self::assertSame('gpt-test', $captured['body']['model']);
