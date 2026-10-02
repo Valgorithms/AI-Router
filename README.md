@@ -24,9 +24,11 @@ Set `TYPESAFE_API_KEY` and `ANTHROPIC_API_KEY`. Authenticate GitHub Copilot CLI 
 Check syntax/tests:
 
 ```powershell
-composer lint
-composer test
+composer cs
+composer unit
 ```
+
+Build a standalone executable with `composer phpacker`. The build output is written under `bin/build/ai-router`.
 
 Run:
 

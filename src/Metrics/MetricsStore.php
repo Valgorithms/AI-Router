@@ -33,6 +33,6 @@ final class MetricsStore
         ], JSON_THROW_ON_ERROR) . PHP_EOL;
 
         return $this->filesystem->directory($directory)->createRecursive()
-            ->then(fn () => $this->filesystem->file($this->path)->append($entry));
+            ->then(fn() => $this->filesystem->file($this->path)->append($entry));
     }
 }

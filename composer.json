@@ -21,12 +21,30 @@
       "VzgCoders\\AiRouter\\Tests\\": "tests/"
     }
   },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3",
+    "phpunit/phpunit": "^9.4.4",
+    "phpacker/phpacker": "^0.6.4"
+  },
   "bin": [
     "bin/ai-router"
   ],
   "scripts": {
     "lint": "php -l bin/ai-router && find src tests -name '*.php' -print0 | xargs -0 -n1 php -l",
-    "test": "php tests/run.php"
+    "test": "@unit",
+    "cs": "php-cs-fixer fix",
+    "unit": "phpunit",
+    "phpacker": "phpacker build --src=bin/ai-router --dest=bin/build/ai-router"
+  },
+  "scripts-descriptions": {
+    "cs": "Format PHP source and tests with PHP-CS-Fixer.",
+    "unit": "Run the PHPUnit unit test suite.",
+    "phpacker": "Build a standalone executable for the AI Router CLI."
+  },
+  "config": {
+    "platform": {
+      "php": "8.2.0"
+    }
   },
   "minimum-stability": "stable",
   "prefer-stable": true

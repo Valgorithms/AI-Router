@@ -26,7 +26,7 @@ final class Router
     /** @return PromiseInterface<array{result:ModelResult,evaluations:list<array<string,mixed>>}> */
     public function run(string $prompt, ?string $workdir = null): PromiseInterface
     {
-        return $this->initialOrder($prompt)->then(fn (array $order) => $this->attempt($prompt, $workdir, $order, 0, []));
+        return $this->initialOrder($prompt)->then(fn(array $order) => $this->attempt($prompt, $workdir, $order, 0, []));
     }
 
     private function attempt(string $prompt, ?string $workdir, array $order, int $index, array $evaluations): PromiseInterface
@@ -47,7 +47,7 @@ final class Router
         }
 
         return $model->complete($prompt, $this->systemPrompt($workdir), $workdir)
-            ->then(fn (ModelResult $result) => $this->evaluator->evaluate($prompt, $result, $workdir)
+            ->then(fn(ModelResult $result) => $this->evaluator->evaluate($prompt, $result, $workdir)
                 ->then(function ($evaluation) use ($prompt, $workdir, $order, $index, $evaluations, $result): PromiseInterface {
                     $entry = [
                         'model' => $result->model,
@@ -85,7 +85,7 @@ final class Router
                 return array_values(array_unique([$choice, ...$default]));
             }
             return $default;
-        }, fn () => $default);
+        }, fn() => $default);
     }
 
     private function systemPrompt(?string $workdir): string

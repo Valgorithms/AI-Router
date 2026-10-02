@@ -16,7 +16,10 @@ final class CopilotModel implements ModelInterface
         private readonly int $timeout,
     ) {}
 
-    public function name(): string { return 'copilot'; }
+    public function name(): string
+    {
+        return 'copilot';
+    }
 
     public function complete(string $prompt, string $systemPrompt = '', ?string $workdir = null): PromiseInterface
     {
@@ -39,8 +42,12 @@ final class CopilotModel implements ModelInterface
         });
 
         $process->start();
-        $process->stdout?->on('data', function (string $chunk) use (&$stdout): void { $stdout .= $chunk; });
-        $process->stderr?->on('data', function (string $chunk) use (&$stderr): void { $stderr .= $chunk; });
+        $process->stdout?->on('data', function (string $chunk) use (&$stdout): void {
+            $stdout .= $chunk;
+        });
+        $process->stderr?->on('data', function (string $chunk) use (&$stderr): void {
+            $stderr .= $chunk;
+        });
         $process->on('exit', function (?int $exitCode) use (&$settled, &$stdout, &$stderr, $deferred, $started, $timer): void {
             Loop::cancelTimer($timer);
             if ($settled) {

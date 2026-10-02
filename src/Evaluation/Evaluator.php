@@ -24,12 +24,12 @@ final class Evaluator
 
         $state = "Task:\n{$prompt}\n\nModel: {$result->model}\n\nResponse:\n{$result->content}";
         return $this->jev->evaluate($state)->then(
-            fn (array $decision): EvaluationResult => new EvaluationResult(
+            fn(array $decision): EvaluationResult => new EvaluationResult(
                 $decision['choice'] === 'success',
                 $decision['choice'],
                 $decision['confidence'],
             ),
-            fn (\Throwable $e): EvaluationResult => new EvaluationResult(false, 'Jev evaluation failed: ' . $e->getMessage(), 0.0),
+            fn(\Throwable $e): EvaluationResult => new EvaluationResult(false, 'Jev evaluation failed: ' . $e->getMessage(), 0.0),
         );
     }
 }

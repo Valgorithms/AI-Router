@@ -18,7 +18,10 @@ final class OllamaModel implements ModelInterface
         private readonly HttpClient $http,
     ) {}
 
-    public function name(): string { return 'local'; }
+    public function name(): string
+    {
+        return 'local';
+    }
 
     public function complete(string $prompt, string $systemPrompt = '', ?string $workdir = null): PromiseInterface
     {

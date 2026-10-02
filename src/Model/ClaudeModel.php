@@ -18,7 +18,10 @@ final class ClaudeModel implements ModelInterface
         private readonly HttpClient $http,
     ) {}
 
-    public function name(): string { return 'claude'; }
+    public function name(): string
+    {
+        return 'claude';
+    }
 
     public function complete(string $prompt, string $systemPrompt = '', ?string $workdir = null): PromiseInterface
     {
