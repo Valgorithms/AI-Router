@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace VzgCoders\AiRouter\Metrics;
 
-use React\Filesystem\Filesystem;
 use React\Promise\PromiseInterface;
 use VzgCoders\AiRouter\Evaluation\EvaluationResult;
 use VzgCoders\AiRouter\Model\ModelResult;
@@ -12,11 +11,10 @@ use VzgCoders\AiRouter\Model\ModelResult;
 final class MetricsStore
 {
     public function __construct(
-        private readonly Filesystem $filesystem,
         private readonly string $path,
     ) {}
 
-    /** @return PromiseInterface<null> */
+    /** @return PromiseInterface<null> Metrics failures never fail routing; the promise always resolves. */
     public function record(string $prompt, ModelResult $result, EvaluationResult $evaluation): PromiseInterface
     {
         $directory = dirname($this->path);
@@ -32,7 +30,11 @@ final class MetricsStore
             'error' => $result->error,
         ], JSON_THROW_ON_ERROR) . PHP_EOL;
 
-        return $this->filesystem->directory($directory)->createRecursive()
-            ->then(fn() => $this->filesystem->file($this->path)->append($entry));
+        if (is_dir($directory) || @mkdir($directory, 0o777, true) || is_dir($directory)) {
+            // Regular files cannot use non-blocking streams (notably on Windows); one small append is acceptable.
+            @file_put_contents($this->path, $entry, FILE_APPEND | LOCK_EX);
+        }
+
+        return \React\Promise\resolve(null);
     }
 }

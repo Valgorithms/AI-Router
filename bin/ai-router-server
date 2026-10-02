@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+use React\Http\HttpServer;
+use React\Socket\SocketServer;
+use VzgCoders\AiRouter\Application;
+use VzgCoders\AiRouter\Server\ApiServer;
+use VzgCoders\AiRouter\Support\Env;
+
+$root = dirname(__DIR__);
+$router = Application::create($root);
+
+$host = Env::string('ROUTER_HOST', '127.0.0.1');
+$port = Env::int('ROUTER_PORT', 8787);
+$modelId = Env::string('ROUTER_MODEL_ID', 'ai-router');
+
+$http = new HttpServer(new ApiServer($router, $modelId, Env::string('ROUTER_API_KEY')));
+$http->on('error', static fn(\Throwable $e) => fwrite(STDERR, 'Server error: ' . $e->getMessage() . "\n"));
+$socket = new SocketServer("{$host}:{$port}");
+$http->listen($socket);
+
+fwrite(STDERR, "AI Router listening on http://{$host}:{$port}/v1 (model: {$modelId})\n");

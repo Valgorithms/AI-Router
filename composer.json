@@ -9,6 +9,8 @@
     "react/child-process": "^0.6",
     "react/http": "^1.11",
     "react/promise-timer": "^1.11",
+    "react/socket": "^1.17",
+    "react/stream": "^1.4",
     "vlucas/phpdotenv": "^5.6"
   },
   "autoload": {
@@ -34,9 +36,11 @@
     "test": "@unit",
     "cs": "php-cs-fixer fix",
     "unit": "phpunit",
-    "phpacker": "phpacker build --src=bin/ai-router --dest=bin/build/ai-router"
+    "phpacker": "phpacker build --src=bin/ai-router --dest=bin/build/ai-router",
+    "serve": "@php bin/ai-router-server"
   },
   "scripts-descriptions": {
+    "serve": "Start the OpenAI-compatible HTTP server for Copilot Chat.",
     "cs": "Format PHP source and tests with PHP-CS-Fixer.",
     "unit": "Run the PHPUnit unit test suite.",
     "phpacker": "Build a standalone executable for the AI Router CLI."

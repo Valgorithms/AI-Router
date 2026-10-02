@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace VzgCoders\AiRouter;
 
-use React\Filesystem\Filesystem;
 use React\Http\Browser;
 use VzgCoders\AiRouter\Evaluation\Evaluator;
 use VzgCoders\AiRouter\Metrics\MetricsStore;
@@ -31,19 +30,26 @@ final class Application
             $http,
         );
 
-        $claude = new ClaudeModel(
-            Env::required('ANTHROPIC_API_KEY'),
-            Env::string('ANTHROPIC_URL', 'https://api.anthropic.com'),
-            Env::string('ANTHROPIC_MODEL', 'claude-sonnet-4-5'),
-            Env::int('ANTHROPIC_MAX_TOKENS', 8192),
-            Env::int('ANTHROPIC_TIMEOUT', 120),
-            $http,
-        );
+        $models = ['local' => $ollama];
+
+        $anthropicKey = Env::string('ANTHROPIC_API_KEY');
+        if ($anthropicKey !== null && $anthropicKey !== '') {
+            $models['claude'] = new ClaudeModel(
+                $anthropicKey,
+                Env::string('ANTHROPIC_URL', 'https://api.anthropic.com'),
+                Env::string('ANTHROPIC_MODEL', 'claude-sonnet-4-5'),
+                Env::int('ANTHROPIC_MAX_TOKENS', 8192),
+                Env::int('ANTHROPIC_TIMEOUT', 120),
+                $http,
+            );
+        }
 
         $copilot = new CopilotModel(
             Env::string('COPILOT_COMMAND', 'copilot'),
             Env::int('COPILOT_TIMEOUT', 300),
         );
+
+        $models['copilot'] = $copilot;
 
         $jev = null;
         $jevKey = Env::string('TYPESAFE_API_KEY');
@@ -58,12 +64,11 @@ final class Application
         }
 
         $metrics = new MetricsStore(
-            Filesystem::createFromLoop(\React\EventLoop\Loop::get()),
             Env::string('METRICS_FILE', $root . '/var/metrics.jsonl'),
         );
 
         return new Router(
-            ['local' => $ollama, 'claude' => $claude, 'copilot' => $copilot],
+            $models,
             $jev,
             new Evaluator($jev),
             $metrics,

@@ -31,7 +31,10 @@ final class Router
 
     private function attempt(string $prompt, ?string $workdir, array $order, int $index, array $evaluations): PromiseInterface
     {
-        if ($index >= count($order) || $index >= $this->maxAttempts) {
+        // The local model is always reachable as a fallback, even when the attempt cap would otherwise skip it.
+        $localPosition = array_search('local', $order, true);
+        $limit = is_int($localPosition) ? max($this->maxAttempts, $localPosition + 1) : $this->maxAttempts;
+        if ($index >= count($order) || $index >= $limit) {
             $last = $evaluations[count($evaluations) - 1] ?? null;
             $model = is_array($last) ? (string) ($last['model'] ?? 'none') : 'none';
             return \React\Promise\resolve([
