@@ -1,0 +1,54 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+use React\Async;
+use VzgCoders\AiRouter\Application;
+
+$args = $argv;
+array_shift($args);
+$workdir = null;
+$promptParts = [];
+
+while ($args !== []) {
+    $arg = array_shift($args);
+    if ($arg === '--workdir') {
+        $workdir = array_shift($args);
+        if ($workdir === null) {
+            fwrite(STDERR, "--workdir requires a path.\n");
+            exit(2);
+        }
+        continue;
+    }
+    if ($arg === '--help' || $arg === '-h') {
+        echo "Usage: ai-router [--workdir PATH] PROMPT\n";
+        exit(0);
+    }
+    $promptParts[] = $arg;
+}
+
+$prompt = trim(implode(' ', $promptParts));
+if ($prompt === '') {
+    fwrite(STDERR, "A prompt is required.\n");
+    exit(2);
+}
+
+$root = dirname(__DIR__);
+$router = Application::create($root);
+$result = Async\await($router->run($prompt, $workdir));
+
+fwrite(STDERR, "Model: {$result['result']->model}\n");
+foreach ($result['evaluations'] as $evaluation) {
+    fwrite(STDERR, sprintf(
+        "  %-8s %s (%.2fs)\n",
+        $evaluation['model'],
+        $evaluation['success'] ? 'success' : 'escalated',
+        $evaluation['latency_seconds'],
+    ));
+}
+
+echo $result['result']->content . PHP_EOL;
+exit($result['result']->transportSuccess ? 0 : 1);
