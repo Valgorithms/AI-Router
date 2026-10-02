@@ -73,18 +73,24 @@ final class Router
     /** @return PromiseInterface<list<string>> */
     private function initialOrder(string $prompt): PromiseInterface
     {
-        $default = ['local', 'claude', 'copilot'];
+        $default = array_values(array_filter(
+            ['local', 'claude', 'openai', 'copilot'],
+            fn(string $name): bool => isset($this->models[$name]),
+        ));
         if (!$this->localFirst || $this->jev === null) {
             return \React\Promise\resolve($default);
         }
 
-        return $this->jev->choose($prompt, [
+        $descriptions = [
             'local' => 'Preferred default. Use for routine coding, explanation, documentation, bounded debugging, and tasks with sufficient context.',
             'claude' => 'Use first when the task is complex, ambiguous, reasoning-heavy, or likely to exceed local capability.',
+            'openai' => 'Use first for complex reasoning, broad general knowledge, or tasks likely to exceed local capability.',
             'copilot' => 'Use first only when GitHub-native repository context or Copilot-specific tooling is particularly useful.',
-        ])->then(function (array $decision) use ($default): array {
+        ];
+
+        return $this->jev->choose($prompt, array_intersect_key($descriptions, array_flip($default)))->then(function (array $decision) use ($default): array {
             $choice = $decision['choice'];
-            if ($decision['confidence'] >= $this->cloudConfidenceThreshold && in_array($choice, ['claude', 'copilot'], true)) {
+            if ($decision['confidence'] >= $this->cloudConfidenceThreshold && $choice !== 'local' && in_array($choice, $default, true)) {
                 return array_values(array_unique([$choice, ...$default]));
             }
             return $default;

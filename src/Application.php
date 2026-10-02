@@ -10,6 +10,7 @@ use VzgCoders\AiRouter\Metrics\MetricsStore;
 use VzgCoders\AiRouter\Model\ClaudeModel;
 use VzgCoders\AiRouter\Model\CopilotModel;
 use VzgCoders\AiRouter\Model\OllamaModel;
+use VzgCoders\AiRouter\Model\OpenAiModel;
 use VzgCoders\AiRouter\Support\Env;
 use VzgCoders\AiRouter\Support\HttpClient;
 
@@ -40,6 +41,18 @@ final class Application
                 Env::string('ANTHROPIC_MODEL', 'claude-sonnet-4-5'),
                 Env::int('ANTHROPIC_MAX_TOKENS', 8192),
                 Env::int('ANTHROPIC_TIMEOUT', 120),
+                $http,
+            );
+        }
+
+        $openAiKey = Env::string('OPENAI_API_KEY');
+        if ($openAiKey !== null && $openAiKey !== '') {
+            $models['openai'] = new OpenAiModel(
+                $openAiKey,
+                Env::string('OPENAI_URL', 'https://api.openai.com/v1'),
+                Env::string('OPENAI_MODEL', 'gpt-4.1'),
+                Env::int('OPENAI_MAX_TOKENS', 8192),
+                Env::int('OPENAI_TIMEOUT', 120),
                 $http,
             );
         }
