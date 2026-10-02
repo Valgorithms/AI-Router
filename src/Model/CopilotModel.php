@@ -26,6 +26,20 @@ final class CopilotModel implements ModelInterface
         return 'copilot';
     }
 
+    /**
+     * Drops the BYOK variables so the Copilot CLI uses its own models instead of looping back into this router.
+     *
+     * @return array<string, string>
+     */
+    private static function childEnvironment(): array
+    {
+        return array_filter(
+            getenv(),
+            static fn(string $name): bool => stripos($name, 'COPILOT_PROVIDER_') !== 0 && strcasecmp($name, 'COPILOT_MODEL') !== 0,
+            ARRAY_FILTER_USE_KEY,
+        );
+    }
+
     public function complete(string $prompt, string $systemPrompt = '', ?string $workdir = null): PromiseInterface
     {
         $started = microtime(true);
@@ -53,6 +67,7 @@ final class CopilotModel implements ModelInterface
             [0 => ['file', $inPath, 'r'], 1 => ['file', $outPath, 'w'], 2 => ['file', $errPath, 'w']],
             $pipes,
             $workingDirectory ?: null,
+            self::childEnvironment(),
         );
         if (!is_resource($process)) {
             $cleanup();

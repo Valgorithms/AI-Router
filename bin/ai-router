@@ -6,10 +6,15 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 use React\Async;
+use React\Http\HttpServer;
+use React\Socket\SocketServer;
 use VzgCoders\AiRouter\Application;
+use VzgCoders\AiRouter\Server\ApiServer;
+use VzgCoders\AiRouter\Support\Env;
 
 $args = $argv;
 array_shift($args);
+$serve = false;
 $workdir = null;
 $promptParts = [];
 
@@ -23,11 +28,31 @@ while ($args !== []) {
         }
         continue;
     }
+    if ($arg === '--serve') {
+        $serve = true;
+        continue;
+    }
     if ($arg === '--help' || $arg === '-h') {
-        echo "Usage: ai-router [--workdir PATH] PROMPT\n";
+        echo "Usage: ai-router [--workdir PATH] PROMPT\n       ai-router --serve\n";
         exit(0);
     }
     $promptParts[] = $arg;
+}
+
+// Inside a PHAR / compiled binary the app directory is read-only, so .env and var/ live in the working directory.
+$root = Phar::running(false) !== '' ? getcwd() : dirname(__DIR__);
+
+if ($serve) {
+    $router = Application::create($root);
+    $host = Env::string('ROUTER_HOST', '127.0.0.1');
+    $port = Env::int('ROUTER_PORT', 8787);
+    $modelId = Env::string('ROUTER_MODEL_ID', 'ai-router');
+
+    $http = new HttpServer(new ApiServer($router, $modelId, Env::string('ROUTER_API_KEY')));
+    $http->on('error', static fn(\Throwable $e) => fwrite(STDERR, 'Server error: ' . $e->getMessage() . "\n"));
+    $http->listen(new SocketServer("{$host}:{$port}"));
+    fwrite(STDERR, "AI Router listening on http://{$host}:{$port}/v1 (model: {$modelId})\n");
+    return;
 }
 
 $prompt = trim(implode(' ', $promptParts));
@@ -36,8 +61,6 @@ if ($prompt === '') {
     exit(2);
 }
 
-// Inside a PHAR / compiled binary the app directory is read-only, so .env and var/ live in the working directory.
-$root = Phar::running(false) !== '' ? getcwd() : dirname(__DIR__);
 $router = Application::create($root);
 $result = Async\await($router->run($prompt, $workdir));
 

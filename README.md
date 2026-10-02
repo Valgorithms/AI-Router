@@ -39,6 +39,8 @@ Start the OpenAI-compatible server:
 composer serve
 ```
 
+A compiled binary can start the same server with `ai-router --serve` (for example from a Windows Startup shortcut, with the working directory set to the folder containing `.env`).
+
 It listens on `http://127.0.0.1:8787/v1` (`ROUTER_HOST`, `ROUTER_PORT`) and exposes `GET /v1/models` and `POST /v1/chat/completions` (streaming is emulated). Each request tries your local Ollama model first and falls back to Claude (if `ANTHROPIC_API_KEY` is set), OpenAI (if `OPENAI_API_KEY` is set) and then the Copilot CLI, which uses its own automatic model selection. Without Jev configured, a fallback only happens on transport failures (timeouts, errors, empty output); with `TYPESAFE_API_KEY` set, Jev also judges response quality.
 
 In VS Code, run **Chat: Manage Language Models** → **Add Models** → **OpenAI Compatible**, use the URL above and model id `ai-router` (set `ROUTER_API_KEY` to require a bearer token). Select it in the Chat model picker.
