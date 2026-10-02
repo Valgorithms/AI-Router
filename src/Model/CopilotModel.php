@@ -68,7 +68,9 @@ final class CopilotModel implements ModelInterface
                 return;
             }
 
-            Loop::cancelTimer($timer);
+            if ($timer !== null) {
+                Loop::cancelTimer($timer);
+            }
             $elapsed = microtime(true) - $started;
             if ($timedOut) {
                 proc_terminate($process);
