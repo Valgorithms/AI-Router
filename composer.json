@@ -1,6 +1,6 @@
 {
   "name": "vzgcoders/ai-router",
-  "description": "ReactPHP local-first AI model router with Jev-driven routing and escalation.",
+  "description": "ReactPHP local-first AI model router: tries a local Ollama model first and falls back to Claude, OpenAI and the Copilot CLI, with optional Jev routing and evaluation. Ships a CLI and an OpenAI-compatible HTTP endpoint.",
   "type": "project",
   "license": "MIT",
   "require": {

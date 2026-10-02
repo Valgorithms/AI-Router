@@ -1,6 +1,6 @@
 # VZG Coders AI Router
 
-ReactPHP-based local-first AI model router. Jev provides the routing/evaluation signal; PHP owns orchestration and escalation.
+ReactPHP-based local-first AI model router. It tries a local Ollama model first and falls back to Claude, OpenAI and the GitHub Copilot CLI. Jev is optional and provides the routing/evaluation signal; PHP owns orchestration and escalation. It runs as a CLI or as an OpenAI-compatible HTTP endpoint (for example for Copilot Chat), and can be compiled to standalone executables for Windows, macOS and Linux.
 
 ## Model order
 
