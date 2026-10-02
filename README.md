@@ -28,7 +28,7 @@ composer cs
 composer unit
 ```
 
-Build a standalone executable with `composer phpacker`. The build output is written under `bin/build/ai-router`.
+Build standalone executables with `composer phpacker`. It packages the app and its production dependencies into `bin/build/ai-router.phar`, then compiles it for every PHPacker target (Windows x64, Linux x64/arm, macOS x64/arm) into `bin/build/ai-router/<platform>/`. The first build downloads the PHP binaries, so it needs internet access. A compiled binary reads `.env` and writes `var/metrics.jsonl` in the directory it is run from.
 
 ## Use from GitHub Copilot Chat (VS Code)
 

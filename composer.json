@@ -36,14 +36,19 @@
     "test": "@unit",
     "cs": "php-cs-fixer fix",
     "unit": "phpunit",
-    "phpacker": "phpacker build --src=bin/ai-router --dest=bin/build/ai-router",
+    "phar": "@php -d phar.readonly=0 build/build-phar.php",
+    "phpacker": [
+      "@phar",
+      "phpacker build all --src=bin/build/ai-router.phar --dest=bin/build/ai-router"
+    ],
     "serve": "@php bin/ai-router-server"
   },
   "scripts-descriptions": {
     "serve": "Start the OpenAI-compatible HTTP server for Copilot Chat.",
     "cs": "Format PHP source and tests with PHP-CS-Fixer.",
     "unit": "Run the PHPUnit unit test suite.",
-    "phpacker": "Build a standalone executable for the AI Router CLI."
+    "phar": "Build bin/build/ai-router.phar (app plus production dependencies).",
+    "phpacker": "Build standalone executables for Windows, macOS and Linux (all architectures) from the PHAR."
   },
   "config": {
     "platform": {

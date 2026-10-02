@@ -1,6 +1,7 @@
 /vendor/
 .env
 /var/
+/bin/build/
 .phpunit.result.cache
 .php-cs-fixer.cache
 .idea/

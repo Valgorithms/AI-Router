@@ -36,7 +36,8 @@ if ($prompt === '') {
     exit(2);
 }
 
-$root = dirname(__DIR__);
+// Inside a PHAR / compiled binary the app directory is read-only, so .env and var/ live in the working directory.
+$root = Phar::running(false) !== '' ? getcwd() : dirname(__DIR__);
 $router = Application::create($root);
 $result = Async\await($router->run($prompt, $workdir));
 
