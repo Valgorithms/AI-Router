@@ -31,34 +31,31 @@ final class BrowserFactoryTest extends TestCase
         }
     }
 
-        public function testBuildsBrowserWithoutRequiringWmicOnWindows(): void
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testBuildsBrowserWithoutRequiringWmicOnWindows(): void
     {
-        $key = 'ROUTER_DNS_SERVER';
-        $oldEnv = $_ENV;
-        $oldServer = $_SERVER;
-
-        try {
-            unset($_ENV[$key], $_SERVER[$key]);
-            if (PHP_OS_FAMILY === 'Windows') {
-                set_error_handler(static function (int $severity, string $message): bool {
-                    if ($severity === E_DEPRECATED && str_contains($message, 'preg_match_all')) {
-                        self::fail('Browser construction attempted WMIC-backed DNS discovery.');
-                    }
-
-                    return false;
-                });
-            }
-
-            try {
-                self::assertInstanceOf(Browser::class, BrowserFactory::create());
-            } finally {
-                if (PHP_OS_FAMILY === 'Windows') {
-                    restore_error_handler();
-                }
-            }
-        } finally {
-            $_ENV = $oldEnv;
-            $_SERVER = $oldServer;
+        if (PHP_OS_FAMILY !== 'Windows' || !function_exists('shell_exec')) {
+            self::markTestSkipped('Windows DNS discovery requires a Windows PHP CLI with shell_exec.');
         }
+
+        require __DIR__ . '/fixtures/windows-dns-shell.php';
+
+        $key = 'ROUTER_DNS_SERVER';
+        unset($_ENV[$key], $_SERVER[$key]);
+
+        self::assertInstanceOf(Browser::class, BrowserFactory::create());
+        self::assertSame(1, $GLOBALS['ai_router_test_dns_discoveries'] ?? 0);
+
+        $_ENV[$key] = '192.0.2.53';
+        self::assertInstanceOf(Browser::class, BrowserFactory::create());
+        self::assertSame(1, $GLOBALS['ai_router_test_dns_discoveries']);
+
+        // The old Router construction cannot pass even if the host still has WMIC.
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('WMIC discovery was attempted');
+        new Browser();
     }
 }
