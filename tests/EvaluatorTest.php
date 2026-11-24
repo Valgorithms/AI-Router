@@ -6,10 +6,10 @@ namespace VzgCoders\AiRouter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use React\Async;
-use React\Http\Browser;
 use VzgCoders\AiRouter\Evaluation\Evaluator;
 use VzgCoders\AiRouter\JevClient;
 use VzgCoders\AiRouter\Model\ModelResult;
+use VzgCoders\AiRouter\Support\BrowserFactory;
 use VzgCoders\AiRouter\Support\HttpClient;
 
 final class EvaluatorTest extends TestCase
@@ -28,7 +28,7 @@ final class EvaluatorTest extends TestCase
 
     public function testAcceptsResponseWhenJevIsUnreachable(): void
     {
-        $jev = new JevClient('key', 'http://127.0.0.1:1', 'jev', 2, new HttpClient(new Browser()));
+        $jev = new JevClient('key', 'http://127.0.0.1:1', 'jev', 2, new HttpClient(BrowserFactory::create()));
 
         $result = Async\await((new Evaluator($jev))->evaluate(
             'Explain this repository',

@@ -7,11 +7,11 @@ namespace VzgCoders\AiRouter\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Async;
-use React\Http\Browser;
 use React\Http\HttpServer;
 use React\Http\Message\Response;
 use React\Socket\SocketServer;
 use VzgCoders\AiRouter\Model\OpenAiModel;
+use VzgCoders\AiRouter\Support\BrowserFactory;
 use VzgCoders\AiRouter\Support\HttpClient;
 
 final class OpenAiModelTest extends TestCase
@@ -31,7 +31,7 @@ final class OpenAiModelTest extends TestCase
         $server->listen($socket);
         $port = parse_url($socket->getAddress(), PHP_URL_PORT);
 
-        $model = new OpenAiModel('sk-test', "http://127.0.0.1:$port/v1", 'gpt-test', 100, 5, new HttpClient(new Browser()));
+        $model = new OpenAiModel('sk-test', "http://localhost:$port/v1", 'gpt-test', 100, 5, new HttpClient(BrowserFactory::create()));
         $result = Async\await($model->complete('hi', 'be brief'));
         $socket->close();
 
@@ -47,7 +47,7 @@ final class OpenAiModelTest extends TestCase
 
     public function testReportsFailureWhenUnreachable(): void
     {
-        $model = new OpenAiModel('sk-test', 'http://127.0.0.1:1/v1', 'gpt-test', 100, 2, new HttpClient(new Browser()));
+        $model = new OpenAiModel('sk-test', 'http://127.0.0.1:1/v1', 'gpt-test', 100, 2, new HttpClient(BrowserFactory::create()));
         $result = Async\await($model->complete('hi'));
 
         self::assertFalse($result->transportSuccess);
