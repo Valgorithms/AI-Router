@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace VzgCoders\AiRouter;
 
-use React\Http\Browser;
 use VzgCoders\AiRouter\Evaluation\Evaluator;
 use VzgCoders\AiRouter\Metrics\MetricsStore;
 use VzgCoders\AiRouter\Model\ClaudeModel;
 use VzgCoders\AiRouter\Model\CopilotModel;
 use VzgCoders\AiRouter\Model\OllamaModel;
 use VzgCoders\AiRouter\Model\OpenAiModel;
+use VzgCoders\AiRouter\Support\BrowserFactory;
 use VzgCoders\AiRouter\Support\Env;
 use VzgCoders\AiRouter\Support\HttpClient;
 
@@ -19,8 +19,7 @@ final class Application
     public static function create(string $root): Router
     {
         Env::load($root);
-        $browser = new Browser();
-        $http = new HttpClient($browser);
+        $http = new HttpClient(BrowserFactory::create());
 
         $ollama = new OllamaModel(
             Env::string('OLLAMA_URL', 'http://127.0.0.1:11434/v1'),

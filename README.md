@@ -58,3 +58,5 @@ Metrics are appended to `var/metrics.jsonl`.
 ## ReactPHP design
 
 All network calls return promises. The CLI uses `React\Async\await()` at the process boundary. Ollama, Claude and OpenAI use `react/http`; Copilot uses `react/child-process`; the HTTP server uses `react/http` and `react/socket`.
+
+On Windows, AI Router discovers the system DNS servers with PowerShell instead of calling the removed `wmic` command. DNS queries are still asynchronous. If no usable server is discovered, React Socket's previous default of `8.8.8.8` is retained. To bypass discovery or keep queries on a local or VPN resolver, set `ROUTER_DNS_SERVER` to that server's IPv4 or IPv6 address. Linux and macOS retain ReactPHP's default discovery unless this setting is supplied.

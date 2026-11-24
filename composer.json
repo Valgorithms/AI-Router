@@ -7,6 +7,7 @@
     "php": ">=8.2",
     "react/async": "^4.3",
     "react/child-process": "^0.6",
+    "react/dns": "^1.13",
     "react/http": "^1.11",
     "react/promise-timer": "^1.11",
     "react/socket": "^1.17",
